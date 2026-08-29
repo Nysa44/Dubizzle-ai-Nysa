@@ -303,10 +303,9 @@ This allows a user to start a completely new conversation while still having rel
 ---
 
 # Implementation
+The application separates inventory search, focused listing follow-ups, and transactional actions such as bookings and lead qualification. Follow-up references such as “the second one”, “that car”, and “it” are resolved against the active result set or selected listing. Vehicle facts are grounded in the Excel inventory and listing descriptions, with deterministic extraction used for important fields such as price and mileage. The system also includes guardrails for unsupported or non-automotive requests, persistent favourites, long-term memory, lead qualification, and simulated viewing bookings.
 
-The application separates the main responsibilities of the system into independent backend components. Inventory loading, parsing, retrieval, database operations, LLM interaction, API handling, and conversational routing are handled by separate modules. Vehicle information is grounded in the Excel dataset and listing descriptions, while important operations such as vehicle selection, booking validation, lead confirmation, and guardrails use deterministic logic.
-
-The system supports multi-turn context, persistent user memory, saved favourites, lead qualification, CSV lead persistence, and simulated viewing bookings. The application also handles important extraction edge cases, such as distinguishing vehicle mileage from performance values and distinguishing cash prices from monthly finance amounts. Information that is not explicitly available in a listing is not invented.
+Features outside the scope of this prototype could include production authentication, a production database, live inventory synchronization, integration with a real CRM or dealership booking system, real appointment availability, payment processing, large-scale vector search, analytics dashboards, multilingual production support, and cloud deployment infrastructure. These could be added in a production version, but were not necessary for the current prototype.
 
 ---
 
@@ -588,26 +587,10 @@ This verifies that confirmed enquiries are persisted as lead records.
 
 # Demonstrations
 
-Screenshots demonstrating the application's functionality are stored in the `screenshots/` directory.
-
 ## 1. Multi-Turn Inventory Exploration
 
 The application can maintain the active inventory result set and answer follow-up questions about a selected listing.
 
-Example:
-
-```text
-User: Show me Mercedes cars
-
-Assistant: [Mercedes listings]
-
-User: What's the top speed of the second one?
-
-Assistant: [Top speed from the selected listing]
-
-User: What's the mileage of the second one?
-
-Assistant: [Mileage from the same listing]
 ```
 
 **Screenshot:**
@@ -620,16 +603,6 @@ screenshots/Short Term Memory - Specific car.png
 ## 2. Long-Term Memory Across a New Session
 
 The application stores user preferences and favourites in SQLite.
-
-Example:
-
-```text
-Session 1
-
-User: My budget is AED 50,000 and I prefer BMW cars.
-
-Assistant: Preference saved.
-```
 
 A completely new conversation can then retrieve the stored information.
 
