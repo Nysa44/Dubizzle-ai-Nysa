@@ -249,20 +249,6 @@ Retrieval uses deterministic filtering and keyword-based matching over the suppl
 
 The system also separates inventory-wide searches from listing-specific follow-up questions.
 
-For example:
-
-```text
-User: Show me Mercedes cars
-
-Assistant: [Mercedes results]
-
-User: What's the mileage of the second one?
-
-Assistant: [Mileage from the second active listing]
-```
-
-The second question is resolved against the active result set instead of triggering an unrelated inventory search.
-
 ## Memory — SQLite
 
 SQLite is used for persistent state because it is lightweight, local, requires no separate database server, and is sufficient for the scope of this application.
@@ -276,18 +262,6 @@ Short-term session memory stores information such as:
 - Selected listing context
 - Pending booking actions
 - Pending lead actions
-
-This allows references such as:
-
-```text
-the first one
-the second one
-that car
-this car
-it
-```
-
-to be resolved across multiple turns.
 
 ### Long-Term Memory
 
@@ -315,119 +289,21 @@ Features outside the scope of this prototype could include production authentica
 
 Users can search the inventory using natural language.
 
-Examples:
-
-```text
-Show me Mercedes cars
-```
-
-```text
-I'm looking for a 2024 Mercedes GLS
-```
-
-```text
-Show me cars under AED 50,000
-```
-
-```text
-Show me cars with a turbo engine
-```
-
-Results are grounded in the supplied Excel inventory.
-
----
-
 ## Listing-Specific Questions
 
 Users can ask questions about a vehicle currently being discussed.
-
-Examples:
-
-```text
-What's the mileage?
-```
-
-```text
-What's the warranty?
-```
-
-```text
-Is it GCC spec?
-```
-
-```text
-What's the top speed?
-```
-
-If a requested fact is not explicitly stated in the listing, the system avoids inventing an answer.
-
----
 
 ## Multi-Turn Context
 
 The assistant maintains the active result set across turns.
 
-Example:
-
-```text
-User: Show me BMW cars
-
-Assistant: [BMW results]
-
-User: What's the mileage of the second one?
-
-Assistant: [Mileage of second BMW]
-
-User: What about its warranty?
-
-Assistant: [Warranty information for the same vehicle]
-```
-
----
-
 ## Persistent Memory
 
 User preferences and favourites are stored in SQLite.
 
-Example:
-
-```text
-Session 1
-
-User: My budget is AED 50,000 and I prefer BMW cars.
-
-Assistant: Preference saved.
-```
-
-After starting a completely new conversation:
-
-```text
-Session 2
-
-User: What do you remember about me?
-
-Assistant: [Previously stored preferences/history]
-```
-
----
-
 ## Saved Favourites
 
 Users can save vehicles from the current result set.
-
-Example:
-
-```text
-I like the second one. Save it.
-```
-
-Saved vehicles can later be retrieved with:
-
-```text
-What cars have I saved?
-```
-
----
 
 ## Lead Qualification
 
