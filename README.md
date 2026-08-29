@@ -1,147 +1,147 @@
 # Dubizzle Cars — Inventory-First AI Assistant
 
-An AI-powered conversational car discovery assistant built with **FastAPI** and **Streamlit**. The application provides natural-language vehicle search grounded in the supplied Excel inventory, listing-specific follow-up questions, multi-turn conversational context, persistent user memory, saved favourites, lead qualification, and simulated viewing bookings.
+An AI-powered conversational car discovery assistant built with **FastAPI** and **Streamlit**.
 
-The system is designed around an **inventory-first approach**: the supplied Excel dataset is the source of truth for vehicle information, while the language model is used for natural-language understanding and response generation rather than inventing vehicle facts.
+The assistant allows users to search a supplied vehicle inventory using natural language, ask follow-up questions about specific listings, save favourite vehicles, maintain conversational context, recall user preferences across sessions, qualify leads, and simulate vehicle viewing bookings.
+
+The system follows an **inventory-first approach**: the supplied Excel dataset is the source of truth for vehicle information. The language model is used for natural-language understanding and response generation, while vehicle retrieval, important vehicle facts, booking rules, and other critical operations are handled by deterministic application logic.
 
 ---
 
-## Quick Setup
+## Features
 
-### 1. Clone the Repository
+- Natural-language vehicle search
+- Excel-grounded vehicle inventory
+- Listing-specific questions
+- Multi-turn conversational context
+- References such as "the first one", "the second one", and "that car"
+- Persistent user memory
+- Saved vehicle favourites
+- Lead qualification
+- Lead confirmation before persistence
+- Viewing booking simulation
+- Booking conflict protection
+- Vehicle attribute extraction from listing descriptions
+- Price and mileage disambiguation
+- Automotive-specific guardrails
+- Source evidence for listing information
+- Automated regression tests
+
+---
+
+# Quick Setup
+
+## 1. Clone the Repository
 
 ```powershell
 git clone https://github.com/Nysa44/Dubizzle-ai-Nysa.git
 cd Dubizzle-ai-Nysa
-2. Create and Activate the Virtual Environment
+```
 
-Using uv:
+## 2. Create and Activate the Virtual Environment
 
+This project uses `uv` for environment and dependency management.
+
+### Using uv
+
+```powershell
 uv venv
 .venv\Scripts\Activate.ps1
+```
 
-If uv is not installed, a standard Python virtual environment can also be used:
+### Without uv
 
+A standard Python virtual environment can also be used:
+
+```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-3. Install Dependencies
+```
 
-Using uv:
+## 3. Install Dependencies
 
+### Using uv
+
+```powershell
 uv pip install -r requirements.txt --link-mode=copy
+```
 
-Alternatively:
+### Using pip
 
+```powershell
 python -m pip install -r requirements.txt
-4. Configure the Gemini API Key
+```
 
-Create a .env file in the project root:
+## 4. Configure the Gemini API
 
+Create a `.env` file in the project root.
+
+```env
 GEMINI_API_KEY=your_google_ai_studio_api_key
 GEMINI_MODEL=gemini-3.7-flash
+```
 
-The API key is required for the language-model interpretation layer.
+The API key is used by the language-model interpretation layer.
 
-Running the Application
+---
 
-The application consists of a FastAPI backend and a Streamlit frontend.
+# Running the Application
 
-Terminal 1 — Backend
+The application consists of:
 
-Open PowerShell in the project directory and activate the environment:
+- **FastAPI** backend
+- **Streamlit** frontend
 
+Run them in two separate PowerShell terminals.
+
+## Terminal 1 — Backend
+
+From the project directory:
+
+```powershell
 .venv\Scripts\Activate.ps1
-
-Start the FastAPI server:
-
 uvicorn backend.main:app --reload
+```
 
-The backend runs at:
+The FastAPI backend will run at:
 
+```text
 http://127.0.0.1:8000
+```
 
-You can also verify the backend through:
+FastAPI documentation is also available at:
 
+```text
 http://127.0.0.1:8000/docs
+```
 
 A successful startup should show:
 
-INFO: Uvicorn running on http://127.0.0.1:8000
-INFO: Application startup complete.
-Terminal 2 — Frontend
+```text
+INFO:     Uvicorn running on http://127.0.0.1:8000
+INFO:     Application startup complete.
+```
+
+## Terminal 2 — Frontend
 
 Open a second PowerShell terminal in the same project directory:
 
+```powershell
 .venv\Scripts\Activate.ps1
-
-Start Streamlit:
-
 streamlit run frontend/app.py
+```
 
-The interface will be available at:
+The Streamlit interface will normally be available at:
 
+```text
 http://localhost:8501
+```
 
-Open the displayed localhost URL in a browser.
+Open the displayed URL in your browser.
 
-Design Choices
-Client — Streamlit
+---
 
-Streamlit was chosen instead of a Notebook because this project is designed around an interactive conversational experience. A chat-based interface makes it easy to demonstrate natural-language vehicle searches, follow-up questions, saved favourites, persistent memory, lead qualification, and viewing bookings. It also keeps the client lightweight while allowing the backend to remain independently testable through FastAPI.
-
-The Streamlit application acts primarily as the presentation layer. It sends user messages to the FastAPI backend and renders the returned responses, vehicle information, memory state, and interaction controls. This separation also makes it possible to replace the Streamlit client with another interface in the future without rewriting the core backend logic.
-
-Agent / Language Model
-
-The backend uses the Google Gemini model through the google-genai package for natural-language interpretation and conversational responses. The model is not treated as the source of truth for vehicle information. Deterministic application logic handles inventory retrieval, listing selection, important vehicle facts, booking constraints, lead confirmation, and guardrails.
-
-This approach keeps the LLM responsible for understanding natural user requests while the application remains responsible for validating and grounding factual vehicle information.
-
-Search and Retrieval
-
-The supplied Excel workbook is the primary vehicle source. The application loads the cleaned dataset sheet and uses structured fields such as:
-
-Make
-Model
-Year
-Trim
-Title
-Description
-Photo URL
-
-Additional information such as price, mileage, warranty, regional specification, body type, performance, and other vehicle attributes may appear inside listing titles or descriptions. The backend extracts these values from the listing text when they are explicitly present.
-
-Retrieval uses deterministic filtering and keyword-based matching over the inventory rather than relying on an external vector database. This is appropriate for the supplied dataset size and provides predictable, explainable results.
-
-The system also distinguishes between inventory-wide searches and focused follow-up questions. For example, after displaying several vehicles, a question such as:
-
-What's the mileage of the second one?
-
-is resolved against the active result set instead of starting an unrelated new search.
-
-Memory — SQLite
-
-SQLite is used for persistent application state because it requires no external database infrastructure and is lightweight enough for the project.
-
-Short-term memory stores the current session's conversation state, including previous messages, active result listings, and pending booking or lead actions. This allows references such as:
-
-the first one
-the second one
-that car
-this car
-
-to be resolved across multiple turns.
-
-Long-term memory stores user information such as preferences, budgets, and favourites. This allows a returning user to start a completely new conversation while still having relevant preferences or saved vehicles recalled.
-
-Implementation and Design Decisions
-
-The backend is separated into modules responsible for configuration, inventory access, database operations, parsing, schema validation, language-model interaction, and agent behaviour. Vehicle facts are grounded in the Excel dataset and listing descriptions, while important operations such as booking and lead qualification are handled deterministically. This prevents unsupported vehicle information from being generated simply because a language model can produce a plausible answer.
-
-The application also includes multi-turn context handling, persistent user memory, favourites, lead qualification with confirmation, CSV lead persistence, viewing-slot validation, and automotive-specific guardrails. Features outside the scope of this prototype could include real authentication, a production CRM integration, live dealership inventory synchronization, real appointment scheduling, payment processing, production-scale semantic/vector retrieval, analytics dashboards, and deployment infrastructure.
-
-Project Architecture
-## Project Architecture
+# Project Architecture
 
 ```text
 Dubizzle-ai-Nysa/
@@ -171,20 +171,7 @@ Dubizzle-ai-Nysa/
 │   └── app.py
 │
 ├── screenshots/
-│   ├── Booking-Carwise.png
-│   ├── Booking.png
-│   ├── Find Cars Between AED 20K and AED 40K.png
-│   ├── Find Cars under AED 50K.png
-│   ├── Front Page.png
-│   ├── Guardrails.png
-│   ├── Leads saved and Testing.png
-│   ├── Long Term Memory-1.png
-│   ├── Long Term Memory-2.png
-│   ├── Requests Section.png
-│   ├── Short Term Memory - Category.png
-│   ├── Short Term Memory - Specific car.png
-│   ├── Show me SUVS.png
-│   └── SUVS Result.png
+│   └── demonstration screenshots
 │
 ├── tests/
 │   ├── test_api.py
@@ -196,311 +183,595 @@ Dubizzle-ai-Nysa/
 ├── pyproject.toml
 ├── README.md
 └── requirements.txt
-Core Features
-Inventory-Grounded Search
+```
 
-Users can search the supplied inventory using natural language, for example:
+### Backend
 
-Show me Mercedes cars
-I'm looking for a 2024 Mercedes GLS
-Show me cars under AED 50,000
-Show me cars with a turbo engine
+- `main.py` — FastAPI application and API endpoints
+- `agent.py` — conversational routing and agent behaviour
+- `inventory.py` — inventory loading and retrieval
+- `parser.py` — vehicle attribute and listing text extraction
+- `llm.py` — Gemini language-model interaction
+- `db.py` — SQLite persistence and memory operations
+- `config.py` — application configuration
+- `schemas.py` — request and response validation
 
-Results are grounded in the supplied Excel inventory.
+### Frontend
 
-Listing-Specific Questions
+- `app.py` — Streamlit conversational interface
+- `api_client.py` — communication between Streamlit and the FastAPI backend
 
-Users can ask questions about a selected vehicle, including:
+### Data
 
-What's the mileage?
-What's the warranty?
-Is it GCC spec?
-What's the top speed?
+- `cars_dataset.xlsx` — supplied vehicle inventory
+- `leads.csv` — confirmed lead records
+- `nysa.db` — SQLite database containing application/session/user state
 
-If a requested fact is not stated in the listing, the system avoids inventing an answer.
+### Tests
 
-Multi-Turn Context
+The test suite covers API behaviour, inventory handling, parsing, extraction, routing, and memory-related functionality.
 
-The assistant maintains the current result set so follow-up references can be resolved:
+---
 
-Show me BMW cars
-What's the mileage of the second one?
-What about its warranty?
-Persistent Memory
+# Design Choices
 
-The system stores user preferences and favourites in SQLite.
+## Client — Streamlit
 
-A user can start a new conversation and still have previously stored information recalled.
+Streamlit was chosen instead of a Notebook because the application is designed around an interactive conversational experience. A chat-based interface makes it easy to test natural-language vehicle searches, follow-up questions, favourites, memory, lead qualification, and viewing bookings. It also keeps the frontend lightweight while allowing the FastAPI backend to remain independently testable.
 
-Saved Favourites
+The frontend is intentionally separated from the backend. Streamlit is responsible for the user experience and presentation, while FastAPI handles the application logic and data operations. This separation makes the system easier to maintain and allows another client interface to be added later without replacing the backend.
 
-Users can save a vehicle and retrieve their saved cars later.
+## Agent and Language Model
 
-Example:
+The backend uses **Google Gemini** through the `google-genai` package for natural-language understanding and conversational response generation.
 
-I like the second one. Save it.
+The language model is **not treated as the source of truth for vehicle facts**. Instead, deterministic application logic handles inventory retrieval, listing selection, important vehicle attributes, booking constraints, lead confirmation, and guardrails.
 
-Then in a new conversation:
+This design allows the LLM to understand flexible user requests while keeping factual vehicle information grounded in the supplied inventory.
 
-What cars have I saved?
-Lead Qualification
+## Search and Retrieval
 
-The assistant can collect lead information such as:
+The supplied Excel workbook is the primary vehicle source.
 
-Name
-Phone number
-Budget
-Vehicle requirements
-Preferences
+Structured fields are loaded from the cleaned dataset, including:
 
-The user is asked to confirm the enquiry before it is persisted.
+- Make
+- Model
+- Year
+- Trim
+- Title
+- Description
+- Photo URL
 
-Confirmed enquiries are written to:
+Additional vehicle information such as price, mileage, warranty, regional specification, performance, and features can appear inside listing titles and descriptions. The backend extracts these values when they are explicitly present.
 
-data/leads.csv
-Viewing Bookings
+Retrieval uses deterministic filtering and keyword-based matching over the supplied inventory rather than an external vector database. This provides predictable and explainable results for the current dataset size.
 
-Users can request a viewing for a selected listing.
+The system also separates inventory-wide searches from listing-specific follow-up questions.
 
-Viewing hours are restricted to:
+For example:
 
-Monday–Saturday
-8:00 AM–8:00 PM
+```text
+User: Show me Mercedes cars
 
-Bookings are simulated for the application and duplicate listing/time slots are prevented.
+Assistant: [Mercedes results]
 
-Grounding and Guardrails
+User: What's the mileage of the second one?
 
-The application includes deterministic handling for several important edge cases.
+Assistant: [Mileage from the second active listing]
+```
 
-Price vs. Monthly Finance
+The second question is resolved against the active result set instead of triggering an unrelated inventory search.
 
-The system distinguishes a vehicle's cash/asking price from monthly finance amounts so that a monthly payment is not incorrectly presented as the vehicle price.
+## Memory — SQLite
 
-Mileage vs. Performance
+SQLite is used for persistent state because it is lightweight, local, requires no separate database server, and is sufficient for the scope of this application.
 
-Values such as:
+### Short-Term Memory
 
-318 km/h
+Short-term session memory stores information such as:
 
-are treated as performance/top-speed information rather than mileage.
+- Conversation messages
+- Active result listings
+- Selected listing context
+- Pending booking actions
+- Pending lead actions
 
-Missing Information
+This allows references such as:
 
-If a listing does not explicitly contain a requested fact, the assistant returns that the information is not stated/listed rather than generating a value.
-
-Listing Selection
-
-References such as:
-
+```text
 the first one
 the second one
 that car
 this car
 it
+```
 
-are resolved against the active result set where possible.
+to be resolved across multiple turns.
 
-Unsupported Requests
+### Long-Term Memory
 
-Non-automotive requests are handled through application guardrails instead of being answered as general-purpose questions.
+Long-term memory stores user information such as:
 
-Testing
+- Preferences
+- Budget information
+- Saved vehicles
+- User history
 
-The project includes automated regression tests covering the main backend and inventory functionality.
+This allows a user to start a completely new conversation while still having relevant information recalled.
 
-Activate the environment:
+---
 
-.venv\Scripts\Activate.ps1
+# Implementation
 
-Run the complete test suite:
+The application separates the main responsibilities of the system into independent backend components. Inventory loading, parsing, retrieval, database operations, LLM interaction, API handling, and conversational routing are handled by separate modules. Vehicle information is grounded in the Excel dataset and listing descriptions, while important operations such as vehicle selection, booking validation, lead confirmation, and guardrails use deterministic logic.
 
-python -m pytest -q
+The system supports multi-turn context, persistent user memory, saved favourites, lead qualification, CSV lead persistence, and simulated viewing bookings. The application also handles important extraction edge cases, such as distinguishing vehicle mileage from performance values and distinguishing cash prices from monthly finance amounts. Information that is not explicitly available in a listing is not invented.
 
-Expected result:
+---
 
-.......................................... [100%]
+# Core Functionality
 
-42 passed, 1 warning
+## Inventory-Grounded Search
 
-The warning is an environment dependency deprecation warning and does not indicate a failing test.
+Users can search the inventory using natural language.
 
-The tests cover areas including:
+Examples:
 
-Excel inventory loading
-Inventory retrieval
-Vehicle attribute extraction
-Price extraction
-Mileage extraction
-Mercedes GLS information
-Listing-specific follow-ups
-Cheapest/most-expensive queries
-Intent routing
-Guardrails
-Session behaviour
-Long-term memory
-API behaviour
-Lead Verification
+```text
+Show me Mercedes cars
+```
 
-Confirmed leads can be inspected from PowerShell:
+```text
+I'm looking for a 2024 Mercedes GLS
+```
 
-Import-Csv .\data\leads.csv | Format-Table -AutoSize
+```text
+Show me cars under AED 50,000
+```
 
-Example output:
+```text
+Show me cars with a turbo engine
+```
 
-lead_id        created_at           user_id   name   phone
--------        ----------           -------   ----   -----
-LEAD-35CC864D  2026-08-29T15:34:33  nysaa     Nysa   0501234567
+Results are grounded in the supplied Excel inventory.
 
-This verifies that confirmed enquiries are persisted to the CSV file.
+---
 
-Demonstration
-1. Multi-Turn Inventory Conversation
+## Listing-Specific Questions
 
-A multi-turn conversation demonstrates that the assistant can maintain the active inventory result set.
+Users can ask questions about a vehicle currently being discussed.
+
+Examples:
+
+```text
+What's the mileage?
+```
+
+```text
+What's the warranty?
+```
+
+```text
+Is it GCC spec?
+```
+
+```text
+What's the top speed?
+```
+
+If a requested fact is not explicitly stated in the listing, the system avoids inventing an answer.
+
+---
+
+## Multi-Turn Context
+
+The assistant maintains the active result set across turns.
 
 Example:
 
-User:
-I'm interested in the 2024 Mercedes GLS.
+```text
+User: Show me BMW cars
 
-Assistant:
-2024 Mercedes-Benz Gls-Class · Listing #40
-Spec: GCC
-Warranty: stated
+Assistant: [BMW results]
 
-User:
-What's the warranty?
+User: What's the mileage of the second one?
 
-Assistant:
-Warranty: 5 Years Gargash Auto Warranty.
-Regional specification: GCC
+Assistant: [Mileage of second BMW]
 
-A screenshot demonstrating the multi-turn inventory conversation can be added here:
+User: What about its warranty?
 
-screenshots/multi_turn_inventory.png
-2. Long-Term Memory Across a New Session
+Assistant: [Warranty information for the same vehicle]
+```
+
+---
+
+## Persistent Memory
+
+User preferences and favourites are stored in SQLite.
+
+Example:
+
+```text
+Session 1
+
+User: My budget is AED 50,000 and I prefer BMW cars.
+
+Assistant: Preference saved.
+```
+
+After starting a completely new conversation:
+
+```text
+Session 2
+
+User: What do you remember about me?
+
+Assistant: [Previously stored preferences/history]
+```
+
+---
+
+## Saved Favourites
+
+Users can save vehicles from the current result set.
+
+Example:
+
+```text
+I like the second one. Save it.
+```
+
+Saved vehicles can later be retrieved with:
+
+```text
+What cars have I saved?
+```
+
+---
+
+## Lead Qualification
+
+The assistant can collect lead information such as:
+
+- Name
+- Phone number
+- Budget
+- Vehicle requirements
+- Preferences
+
+The user is asked to confirm the enquiry before it is persisted.
+
+Confirmed leads are written to:
+
+```text
+data/leads.csv
+```
+
+---
+
+## Viewing Bookings
+
+Users can request a viewing for a selected vehicle.
+
+Viewing slots are restricted to:
+
+```text
+Monday–Saturday
+8:00 AM–8:00 PM
+```
+
+Bookings are simulated within the application and duplicate listing/time slots are prevented.
+
+---
+
+# Grounding and Guardrails
+
+The application includes deterministic handling for important edge cases.
+
+## Price vs. Monthly Finance
+
+The system distinguishes between a vehicle's cash/asking price and monthly finance amounts.
+
+This prevents a monthly payment from being incorrectly displayed as the vehicle's actual price.
+
+## Mileage vs. Performance
+
+Performance values such as:
+
+```text
+318 km/h
+```
+
+are treated as top-speed information rather than mileage.
+
+## Missing Information
+
+If a requested fact is not explicitly stated in the listing, the assistant does not generate an unsupported value.
+
+Instead, the user is informed that the information is not stated in the listing.
+
+## Listing Selection
+
+References such as:
+
+```text
+the first one
+the second one
+that car
+this car
+it
+```
+
+are resolved against the current active result set where possible.
+
+## Inventory-Wide vs. Focused Queries
+
+The system distinguishes between:
+
+- Searching across the inventory
+- Asking about the currently selected vehicle
+- Performing booking or lead actions
+
+For example, a query such as:
+
+```text
+Which cars have 7 seats?
+```
+
+is treated as an inventory-wide search rather than a question about only the currently focused vehicle.
+
+---
+
+# Testing
+
+The project includes automated regression tests covering the backend, inventory, parsing, extraction, routing, API behaviour, and memory functionality.
+
+Activate the virtual environment:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Run the complete test suite:
+
+```powershell
+python -m pytest -q
+```
+
+Current test result:
+
+```text
+.......................................... [100%]
+
+42 passed, 1 warning
+```
+
+The warning is a dependency deprecation warning from the test environment and does not indicate a failing test.
+
+The tests cover areas including:
+
+- Excel inventory loading
+- Inventory retrieval
+- Vehicle attribute extraction
+- Price extraction
+- Mileage extraction
+- Listing-specific follow-up questions
+- Cheapest/most-expensive queries
+- Intent routing
+- Guardrails
+- Session behaviour
+- Long-term memory
+- API behaviour
+
+---
+
+# Lead Verification
+
+Confirmed leads can be inspected from PowerShell using:
+
+```powershell
+Import-Csv .\data\leads.csv | Format-Table -AutoSize
+```
+
+Example:
+
+```text
+lead_id        created_at           user_id   name   phone
+-------        ----------           -------   ----   -----
+LEAD-XXXXXXXX  2026-08-29T15:34:33  nysaa     Nysa   0501234567
+```
+
+This verifies that confirmed enquiries are persisted as lead records.
+
+---
+
+# Demonstrations
+
+Screenshots demonstrating the application's functionality are stored in the `screenshots/` directory.
+
+## 1. Multi-Turn Inventory Exploration
+
+The application can maintain the active inventory result set and answer follow-up questions about a selected listing.
+
+Example:
+
+```text
+User: Show me Mercedes cars
+
+Assistant: [Mercedes listings]
+
+User: What's the top speed of the second one?
+
+Assistant: [Top speed from the selected listing]
+
+User: What's the mileage of the second one?
+
+Assistant: [Mileage from the same listing]
+```
+
+**Screenshot:**
+
+```text
+screenshots/Short Term Memory - Category.png
+screenshots/Short Term Memory - Specific car.png
+```
+
+## 2. Long-Term Memory Across a New Session
 
 The application stores user preferences and favourites in SQLite.
 
 Example:
 
+```text
 Session 1
 
-User:
-My budget is AED 50,000 and I prefer BMW cars.
+User: My budget is AED 50,000 and I prefer BMW cars.
 
-Assistant:
-Preference saved.
+Assistant: Preference saved.
+```
 
-A new conversation/session is then started using the same user.
+A completely new conversation can then retrieve the stored information.
 
-Session 2
+**Screenshots:**
 
-User:
-What do you remember about me?
+```text
+screenshots/Long Term Memory-1.png
+screenshots/Long Term Memory-2.png
+```
 
-Assistant:
-I remember your budget and vehicle preferences from previous conversations.
+## 3. Lead Qualification and Persistence
 
-Screenshot:
+A user can provide contact information, review the enquiry, and confirm it before it is saved.
 
-screenshots/long_term_memory.png
-3. Lead Qualification
+**Screenshot:**
 
-Example:
+```text
+screenshots/Leads saved and Testing.png
+```
 
-User:
-My name is Nysa and my phone number is 0501234567.
+The resulting lead can also be verified using:
 
-Assistant:
-Here's the enquiry I can save...
-Reply "confirm" and I'll record it.
-
-User:
-confirm
-
-Assistant:
-Done — your enquiry is saved.
-
-The resulting lead can be verified with:
-
+```powershell
 Import-Csv .\data\leads.csv | Format-Table -AutoSize
+```
 
-Screenshot:
+## 4. Guardrails
 
-screenshots/lead_verification.png
-4. Guardrails
+The assistant restricts requests outside its intended automotive functionality.
 
-The application also demonstrates handling of requests outside the intended automotive scope.
+**Screenshot:**
 
-Example:
+```text
+screenshots/Guardrails.png
+```
 
-User:
-Write me Python code.
+## 5. Viewing Booking
 
-Assistant:
-I can help with dubizzle Cars — searching the provided inventory,
-comparing cars, remembering preferences, qualifying enquiries,
-and booking viewing slots.
+The application supports simulated viewing requests with booking validation.
 
-Screenshot:
+**Screenshots:**
 
-screenshots/guardrails.png
-Running the Full Application
+```text
+screenshots/Booking.png
+screenshots/Booking-Carwise.png
+```
+
+---
+
+# Running the Full Application
 
 Use two PowerShell terminals.
 
-Terminal 1
+### Terminal 1 — Backend
+
+```powershell
 cd Dubizzle-ai-Nysa
 .venv\Scripts\Activate.ps1
 uvicorn backend.main:app --reload
-Terminal 2
+```
+
+### Terminal 2 — Frontend
+
+```powershell
 cd Dubizzle-ai-Nysa
 .venv\Scripts\Activate.ps1
 streamlit run frontend/app.py
+```
 
 Then open:
 
+```text
 http://localhost:8501
-Project Scope
+```
 
-The current prototype focuses on:
+---
 
-Grounded vehicle discovery
-Natural-language search
-Listing-level information retrieval
-Multi-turn context
-Persistent user memory
-Favourites
-Lead qualification
-Viewing bookings
-Deterministic guardrails
-Automated testing
+# Project Scope
+
+The current implementation focuses on:
+
+- Grounded vehicle discovery
+- Natural-language search
+- Listing-level information retrieval
+- Multi-turn conversational context
+- Persistent user memory
+- Saved favourites
+- Lead qualification
+- Viewing bookings
+- Deterministic guardrails
+- Automated testing
 
 Potential future extensions include:
 
-Real user authentication
-Production database infrastructure
-Live inventory synchronization
-Real dealership booking integration
-CRM integration
-Payment processing
-Semantic/vector retrieval for much larger inventories
-Multilingual support
-Analytics and sales dashboards
-Production deployment and monitoring
-LLM provider fallback/routing
+- Production user authentication
+- Production database infrastructure
+- Live inventory synchronization
+- Real dealership booking integration
+- CRM integration
+- Payment processing
+- Semantic/vector retrieval for substantially larger inventories
+- Multilingual support
+- Analytics and sales dashboards
+- Production deployment and monitoring
+- LLM provider fallback/routing
 
 These features are outside the scope of the current prototype.
 
-Tech Stack
-Python
-FastAPI — backend API
-Streamlit — conversational frontend
-Google Gemini — language-model interpretation
-Pydantic — request/response validation
-SQLite — persistent application and user memory
-Pandas / OpenPyXL — Excel inventory loading
-Pytest — automated testing
-uv — Python environment and dependency management
+---
+
+# Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Application development |
+| FastAPI | Backend API |
+| Streamlit | Conversational frontend |
+| Google Gemini | Natural-language interpretation |
+| google-genai | Gemini API integration |
+| Pydantic | Request/response validation |
+| SQLite | Persistent memory and application state |
+| Pandas / OpenPyXL | Excel inventory loading |
+| Pytest | Automated testing |
+| uv | Environment and dependency management |
+
+---
+
+# Repository Structure
+
+```text
+backend/       Backend API, agent logic, inventory, parsing and database
+frontend/      Streamlit interface and API client
+data/          Vehicle dataset and application data
+docs/          Supporting documentation and demo notes
+screenshots/   Application demonstration screenshots
+tests/         Automated regression tests
+```
+
+---
+
+# Notes
+
+The `.env` file is intentionally excluded from version control. Use `.env.example` as the template for configuring the Gemini API key.
+
+Generated application state such as the SQLite database and lead CSV can be excluded from Git when appropriate using the project's `.gitignore`.
