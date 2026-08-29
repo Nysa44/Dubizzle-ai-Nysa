@@ -480,7 +480,9 @@ uvicorn backend.main:app --reload
 ```powershell
 cd Dubizzle-ai-Nysa
 .venv\Scripts\Activate.ps1
-streamlit run frontend/app.py## Demonstrations
+streamlit run frontend/app.py
+
+## Demonstrations
 
 ### 1. Multi-Turn Inventory Exploration
 
