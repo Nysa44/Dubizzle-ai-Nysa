@@ -1,0 +1,28 @@
+
+[project]
+name = "dubizzle-nysa"
+version = "1.0.0"
+description = "Grounded conversational AI assistant for the provided dubizzle cars inventory."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.34,<1",
+    "streamlit>=1.42,<2",
+    "pandas>=2.2,<3",
+    "openpyxl>=3.1,<4",
+    "pydantic>=2.10,<3",
+    "pydantic-settings>=2.7,<3",
+    "python-dotenv>=1.0,<2",
+    "requests>=2.32,<3",
+    "google-genai>=1.30,<2",
+    "pytest>=8.3,<9",
+    "httpx>=0.28,<1",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
