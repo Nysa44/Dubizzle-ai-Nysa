@@ -461,72 +461,7 @@ This verifies that confirmed enquiries are persisted as lead records.
 
 ---
 
-# Demonstrations
 
-## 1. Multi-Turn Inventory Exploration
-
-The application can maintain the active inventory result set and answer follow-up questions about a selected listing.
-
-```
-
-**Screenshot:**
-
-```text
-screenshots/Short Term Memory - Category.png
-screenshots/Short Term Memory - Specific car.png
-```
-
-## 2. Long-Term Memory Across a New Session
-
-The application stores user preferences and favourites in SQLite.
-
-A completely new conversation can then retrieve the stored information.
-
-**Screenshots:**
-
-```text
-screenshots/Long Term Memory-1.png
-screenshots/Long Term Memory-2.png
-```
-
-## 3. Lead Qualification and Persistence
-
-A user can provide contact information, review the enquiry, and confirm it before it is saved.
-
-**Screenshot:**
-
-```text
-screenshots/Leads saved and Testing.png
-```
-
-The resulting lead can also be verified using:
-
-```powershell
-Import-Csv .\data\leads.csv | Format-Table -AutoSize
-```
-
-## 4. Guardrails
-
-The assistant restricts requests outside its intended automotive functionality.
-
-**Screenshot:**
-
-```text
-screenshots/Guardrails.png
-```
-
-## 5. Viewing Booking
-
-The application supports simulated viewing requests with booking validation.
-
-**Screenshots:**
-
-```text
-screenshots/Booking.png
-screenshots/Booking-Carwise.png
-```
-
----
 
 # Running the Full Application
 
@@ -545,7 +480,75 @@ uvicorn backend.main:app --reload
 ```powershell
 cd Dubizzle-ai-Nysa
 .venv\Scripts\Activate.ps1
-streamlit run frontend/app.py
+streamlit run frontend/app.py## Demonstrations
+
+### 1. Multi-Turn Inventory Exploration
+
+The assistant maintains the active inventory result set across multiple turns, allowing follow-up questions to refer to previously displayed vehicles using expressions such as "the first one", "the second one", or "that car".
+
+![Short-Term Memory - Category](screenshots/Short%20Term%20Memory%20-%20Category.png)
+
+![Short-Term Memory - Specific Car](screenshots/Short%20Term%20Memory%20-%20Specific%20car.png)
+
+---
+
+### 2. Long-Term Memory Across a New Session
+
+The application stores user preferences and favourites in SQLite. When a completely new conversation is started with the same user, previously stored information can be recalled.
+
+![Long-Term Memory - Session 1](screenshots/Long%20Term%20Memory-1.png)
+
+![Long-Term Memory - Session 2](screenshots/Long%20Term%20Memory-2.png)
+
+---
+
+### 3. Booking Flow
+
+The assistant supports viewing bookings with validation, confirmation, and protection against duplicate listing/time slots.
+
+![Booking Flow](screenshots/Booking.png)
+
+![Booking - Carwise](screenshots/Booking-%20Carwise.png)
+
+---
+
+### 4. Lead Qualification and Persistence
+
+Qualified enquiries are confirmed before being saved to `data/leads.csv`. The stored lead contains information such as the lead ID, timestamp, user ID, session ID, contact information, and budget.
+
+![Lead Qualification and Testing](screenshots/Leads%20saved%20and%20Testing.png)
+
+---
+
+### 5. Guardrails
+
+The application includes deterministic guardrails for non-automotive requests and unsupported requests, preventing the assistant from treating unrelated queries as vehicle searches.
+
+![Guardrails](screenshots/Guardrails.png)
+
+---
+
+### 6. Inventory Search Examples
+
+The following screenshots demonstrate natural-language inventory searches using different filtering requirements.
+
+![Find Cars Between AED 20K and AED 40K](screenshots/Find%20Cars%20between%20AED%2020K%20and%20AED%2040K.png)
+
+![Find Cars Under AED 50K](screenshots/Find%20Cars%20under%20AED%2050K.png)
+
+![Show Me SUVs](screenshots/Show%20me%20SUVS.png)
+
+![SUV Results](screenshots/SUVS%20Result.png)
+
+---
+
+### 7. Interface
+
+The Streamlit interface provides the conversational chat experience and allows users to search inventory, inspect listings, save favourites, manage conversations, and initiate bookings.
+
+![Front Page](screenshots/Front%20Page.png)
+
+![Requests Section](screenshots/Requests%20Section.png)
 ```
 
 Then open:
