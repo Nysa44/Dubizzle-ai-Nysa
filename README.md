@@ -342,28 +342,6 @@ Real-world integrations were intentionally kept outside the current scope so tha
 
 The assistant maintains the active inventory result set across multiple turns. After searching for vehicles, the user can ask follow-up questions about the returned vehicles without repeating the original search.
 
-For example:
-
-```text
-User:
-Show me SUVs under AED 50,000.
-
-Assistant:
-Here are the matching SUVs...
-
-User:
-Which one has the lowest mileage?
-
-Assistant:
-The lowest-mileage option is ...
-
-User:
-Tell me more about that one.
-
-Assistant:
-Here are the details for the selected vehicle...
-```
-
 ### Screenshots
 
 ![Multi-Turn Inventory - Category](./screenshots/Short%20Term%20Memory%20-%20Category.png)
@@ -378,30 +356,6 @@ The application stores user preferences and favourites in persistent storage.
 
 A user can provide a preference during one conversation and then start a completely new conversation. The assistant can retrieve the stored information and use it when responding to the user.
 
-Example:
-
-```text
-Session 1
-
-User:
-I prefer SUVs and my budget is around AED 50,000.
-
-Assistant:
-Got it. I'll keep that preference in mind.
-```
-
-A new session can then retrieve the stored preference:
-
-```text
-Session 2
-
-User:
-What kind of cars do I usually prefer?
-
-Assistant:
-You previously mentioned that you prefer SUVs
-with a budget around AED 50,000.
-```
 
 ### Screenshots
 
@@ -417,19 +371,6 @@ Users can provide their contact information when they are interested in a vehicl
 
 The application collects the required information, presents the enquiry for confirmation, and persists confirmed enquiries into `data/leads.csv`.
 
-Example stored fields include:
-
-```text
-lead_id
-created_at
-user_id
-session_id
-name
-phone
-email
-min_budget_aed
-max_budget_aed
-```
 
 ### Screenshot
 
