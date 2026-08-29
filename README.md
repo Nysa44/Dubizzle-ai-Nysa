@@ -388,7 +388,7 @@ The booking flow includes validation to prevent conflicting bookings.
 
 ![Booking](./screenshots/Booking.png)
 
-![Booking - Carwise](./screenshots/Booking%20-%20Carwise.png)
+![Booking - Carwise](screenshots/Booking-%20Carwise.png)
 
 ---
 
